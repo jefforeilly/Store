@@ -14,7 +14,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.io.ByteArrayInputStream;
 
-import io.reactivex.Maybe;
 import io.reactivex.Single;
 import okio.BufferedSource;
 import okio.Okio;
@@ -43,9 +42,9 @@ public class SourceDiskDaoStoreTest {
         MockitoAnnotations.initMocks(this);
         GsonSourceParser<Foo> parser = new GsonSourceParser<>(new Gson(), Foo.class);
         Store<Foo, BarCode> store = StoreBuilder.<BarCode, BufferedSource, Foo>parsedWithKey()
-                .persister(diskDAO)
                 .fetcher(fetcher)
                 .parser(parser)
+//                .persister(diskDAO)
                 .open();
 
         Foo foo = new Foo();
@@ -59,12 +58,12 @@ public class SourceDiskDaoStoreTest {
         when(fetcher.fetch(barCode))
                 .thenReturn(value);
 
-        when(diskDAO.read(barCode))
-                .thenReturn(Maybe.<BufferedSource>empty())
-                .thenReturn(value.toMaybe());
-
-        when(diskDAO.write(barCode, source))
-                .thenReturn(Single.just(true));
+//        when(diskDAO.read(barCode))
+//                .thenReturn(Maybe.<BufferedSource>empty())
+//                .thenReturn(value.toMaybe());
+//
+//        when(diskDAO.write(barCode, source))
+//                .thenReturn(Single.just(true));
 
         Foo result = store.get(barCode).blockingGet();
         assertThat(result.bar).isEqualTo(KEY);

@@ -13,7 +13,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.io.ByteArrayInputStream;
 
-import io.reactivex.Maybe;
 import io.reactivex.Single;
 import okio.BufferedSource;
 import okio.Okio;
@@ -44,9 +43,9 @@ public class SourceFilerReaderWriterStoreTest {
         MockitoAnnotations.initMocks(this);
         GsonSourceParser<Foo> parser = new GsonSourceParser<>(new Gson(), Foo.class);
         Store<Foo, BarCode> simpleStore = StoreBuilder.<BarCode, BufferedSource, Foo>parsedWithKey()
-                .persister(fileReader, fileWriter)
                 .fetcher(fetcher)
                 .parser(parser)
+//                .persister(fileReader, fileWriter)
                 .open();
 
         Foo foo = new Foo();
@@ -59,12 +58,12 @@ public class SourceFilerReaderWriterStoreTest {
         when(fetcher.fetch(barCode))
                 .thenReturn(value);
 
-        when(fileReader.read(barCode))
-                .thenReturn(Maybe.<BufferedSource>empty())
-                .thenReturn(value.toMaybe());
-
-        when(fileWriter.write(barCode, source))
-                .thenReturn(Single.just(true));
+//        when(fileReader.read(barCode))
+//                .thenReturn(Maybe.<BufferedSource>empty())
+//                .thenReturn(value.toMaybe());
+//
+//        when(fileWriter.write(barCode, source))
+//                .thenReturn(Single.just(true));
 
         Foo result = simpleStore.get(barCode).blockingGet();
         assertThat(result.bar).isEqualTo(KEY);

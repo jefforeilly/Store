@@ -27,20 +27,20 @@ public class StoreBuilderTest {
         //test  is checking whether types are correct in builders
         Store<Date, Integer> store = StoreBuilder.<Integer, String, Date>parsedWithKey()
                 .fetcher(key -> Single.just(String.valueOf(key)))
-                .persister(new Persister<String, Integer>() {
+                .parser(s -> DATE)
+                .persister(new Persister<Date, Integer>() {
                     @Nonnull
                     @Override
-                    public Maybe<String> read(@Nonnull Integer key) {
-                        return Maybe.just(String.valueOf(key));
+                    public Maybe<Date> read(@Nonnull Integer key) {
+                        return Maybe.just(new Date());
                     }
 
                     @Nonnull
                     @Override
-                    public Single<Boolean> write(@Nonnull Integer key, @Nonnull String s) {
+                    public Single<Boolean> write(@Nonnull Integer key, @Nonnull Date s) {
                         return Single.just(true);
                     }
                 })
-                .parser(s -> DATE)
                 .open();
 
 

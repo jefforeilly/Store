@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 
 import io.reactivex.Maybe;
 
-public interface DiskRead<Raw, Key> {
+public interface DiskRead<Parsed, Key> {
     @Nonnull
-    Maybe<Raw> read(@Nonnull Key key);
+    Maybe<Parsed> read(@Nonnull Key key);
 }

@@ -40,7 +40,7 @@ public class RealStore<Parsed, Key> implements Store<Parsed, Key> {
     }
 
     public <Raw> RealStore(Fetcher<Raw, Key> fetcher,
-                           Persister<Raw, Key> persister,
+                           Persister<Parsed, Key> persister,
                            final Parser<Raw, Parsed> parser) {
         internalStore = new RealInternalStore<>(fetcher,
             persister,
@@ -50,7 +50,7 @@ public class RealStore<Parsed, Key> implements Store<Parsed, Key> {
 
 
     public <Raw> RealStore(Fetcher<Raw, Key> fetcher,
-                           Persister<Raw, Key> persister,
+                           Persister<Parsed, Key> persister,
                            Parser<Raw, Parsed> parser,
                            MemoryPolicy memoryPolicy,
                            StalePolicy policy) {
@@ -59,7 +59,7 @@ public class RealStore<Parsed, Key> implements Store<Parsed, Key> {
     }
 
     public <Raw> RealStore(Fetcher<Raw, Key> fetcher,
-                           Persister<Raw, Key> persister,
+                           Persister<Parsed, Key> persister,
                            KeyParser<Key, Raw, Parsed> parser,
                            MemoryPolicy memoryPolicy,
                            StalePolicy policy) {

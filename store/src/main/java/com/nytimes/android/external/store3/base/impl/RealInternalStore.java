@@ -29,7 +29,7 @@ final class RealInternalStore<Raw, Parsed, Key> implements InternalStore<Parsed,
     Cache<Key, Single<Parsed>> inFlightRequests;
     Cache<Key, Maybe<Parsed>> memCache;
     StalePolicy stalePolicy;
-    Persister<Raw, Key> persister;
+    Persister<Parsed, Key> persister;
     KeyParser<Key, Raw, Parsed> parser;
 
     private final PublishSubject<Key> refreshSubject = PublishSubject.create();
@@ -37,14 +37,14 @@ final class RealInternalStore<Raw, Parsed, Key> implements InternalStore<Parsed,
     private PublishSubject<AbstractMap.SimpleEntry<Key, Parsed>> subject;
 
     RealInternalStore(Fetcher<Raw, Key> fetcher,
-                      Persister<Raw, Key> persister,
+                      Persister<Parsed, Key> persister,
                       KeyParser<Key, Raw, Parsed> parser,
                       StalePolicy stalePolicy) {
         this(fetcher, persister, parser, null, stalePolicy);
     }
 
     RealInternalStore(Fetcher<Raw, Key> fetcher,
-                      Persister<Raw, Key> persister,
+                      Persister<Parsed, Key> persister,
                       KeyParser<Key, Raw, Parsed> parser,
                       MemoryPolicy memoryPolicy,
                       StalePolicy stalePolicy) {
@@ -152,8 +152,7 @@ final class RealInternalStore<Raw, Parsed, Key> implements InternalStore<Parsed,
 
     Maybe<Parsed> readDisk(@Nonnull final Key key) {
         return persister().read(key)
-                .onErrorResumeNext(Maybe.<Raw>empty())
-                .map(raw -> parser.apply(key, raw))
+                .onErrorResumeNext(Maybe.<Parsed>empty())
                 .doOnSuccess(parsed -> {
                     updateMemory(key, parsed);
                     if (stalePolicy == StalePolicy.REFRESH_ON_STALE
@@ -214,8 +213,9 @@ final class RealInternalStore<Raw, Parsed, Key> implements InternalStore<Parsed,
     Single<Parsed> response(@Nonnull final Key key) {
         return fetcher()
                 .fetch(key)
-                .flatMap(raw -> persister()
-                        .write(key, raw)
+                .map(raw -> parser.apply(key, raw))
+                .flatMap(parsed-> persister()
+                        .write(key, parsed)
                         .flatMap(aBoolean -> readDisk(key).toSingle()))
                 .onErrorResumeNext(throwable -> {
                     if (stalePolicy == StalePolicy.NETWORK_BEFORE_STALE) {
@@ -305,9 +305,9 @@ final class RealInternalStore<Raw, Parsed, Key> implements InternalStore<Parsed,
     }
 
     /**
-     * @return DiskDAO that stores and stores <Raw> data
+     * @return DiskDAO that stores and stores <Parsed> data
      */
-    Persister<Raw, Key> persister() {
+    Persister<Parsed, Key> persister() {
         return persister;
     }
 

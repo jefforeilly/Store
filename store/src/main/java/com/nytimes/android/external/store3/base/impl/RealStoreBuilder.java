@@ -25,7 +25,7 @@ import io.reactivex.Single;
  */
 public class RealStoreBuilder<Raw, Parsed, Key> {
     private final List<KeyParser> parsers = new ArrayList<>();
-    private Persister<Raw, Key> persister;
+    private Persister<Parsed, Key> persister;
     private Fetcher<Raw, Key> fetcher;
     private MemoryPolicy memoryPolicy;
 
@@ -44,25 +44,25 @@ public class RealStoreBuilder<Raw, Parsed, Key> {
     }
 
     @Nonnull
-    public RealStoreBuilder<Raw, Parsed, Key> persister(final @Nonnull Persister<Raw, Key> persister) {
+    public RealStoreBuilder<Raw, Parsed, Key> persister(final @Nonnull Persister<Parsed, Key> persister) {
         this.persister = persister;
         return this;
     }
 
     @Nonnull
-    public RealStoreBuilder<Raw, Parsed, Key> persister(final @Nonnull DiskRead<Raw, Key> diskRead,
-                                                        final @Nonnull DiskWrite<Raw, Key> diskWrite) {
-        persister = new Persister<Raw, Key>() {
+    public RealStoreBuilder<Raw, Parsed, Key> persister(final @Nonnull DiskRead<Parsed, Key> diskRead,
+                                                        final @Nonnull DiskWrite<Parsed, Key> diskWrite) {
+        persister = new Persister<Parsed, Key>() {
             @Nonnull
             @Override
-            public Maybe<Raw> read(@Nonnull Key key) {
+            public Maybe<Parsed> read(@Nonnull Key key) {
                 return diskRead.read(key);
             }
 
             @Nonnull
             @Override
-            public Single<Boolean> write(@Nonnull Key key, @Nonnull Raw raw) {
-                return diskWrite.write(key, raw);
+            public Single<Boolean> write(@Nonnull Key key, @Nonnull Parsed parsed) {
+                return diskWrite.write(key, parsed);
             }
         };
         return this;

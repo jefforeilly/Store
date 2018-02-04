@@ -20,9 +20,9 @@ public final class BarCode implements Serializable {
     private static final BarCode EMPTY_BARCODE = new BarCode("", "");
 
     @Nonnull
-    private final String key;
+    private String key;
     @Nonnull
-    private final String type;
+    private String type;
 
     public BarCode(@Nonnull String type, @Nonnull String key) {
         this.key = Preconditions.checkNotNull(key);
@@ -66,6 +66,15 @@ public final class BarCode implements Serializable {
 
         return true;
     }
+
+    public void setKey(@Nonnull String key) {
+        this.key = key;
+    }
+
+    public void setType(@Nonnull String type) {
+        this.type = type;
+    }
+
 
     @Override
     public int hashCode() {
